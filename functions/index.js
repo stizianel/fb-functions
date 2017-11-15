@@ -26,9 +26,11 @@ exports.convertToUppercase = functions.database.ref('/test/{pushId}/text')
         return event.data.ref.parent.child('uppercaseText').set(uppercaseText);
     });
 
-exports.InsertIntoAdiuto = functions.database.ref('/customer/{pushId}/visits')  
-    .onWrite(event => {
+exports.InsertIntoAdiuto = functions.database.ref('/customer/{pushId}/visits/{visId}')  
+    .onCreate(event => {
+        
         const visit = event.data.val();
+        
         const url = 'http://demo.creanetwork.it:8080/adiJed/services/AdiJedWS?wsdl';
         const args = {username: 'immission',
                      password: 'immission'};
@@ -43,8 +45,13 @@ exports.InsertIntoAdiuto = functions.database.ref('/customer/{pushId}/visits')
                 const ids = new Array(1333, 1334, 1335, 1336);
                 const values = new Array();
                 
+                console.log('dati:' + JSON.stringify(visit));
+
+                var dtstrip = visit.visitDate.toString().replace(/-/g, '');
+                
+                console.log(dtstrip);
                 values.push(visit.name);
-                values.push(visit.visitDate);
+                values.push(dtstrip);
                 values.push(visit.priority);
                 values.push(visit.notes);
                 
@@ -52,6 +59,7 @@ exports.InsertIntoAdiuto = functions.database.ref('/customer/{pushId}/visits')
                 arrId['int'] = [1333, 1334, 1335, 1336];
                 
                 var arrValues = {};
+                //arrValues['string'] = ['raso', '20171115', 'alta', 'note'];
                 arrValues['string'] = values;
         
                 const arg1 = {
